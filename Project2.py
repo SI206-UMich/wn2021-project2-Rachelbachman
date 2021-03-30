@@ -5,8 +5,28 @@ import os
 import csv
 import unittest
 
+#worked with Jason Brigandi and Molly Hericks 
 
 def get_titles_from_search_results(filename):
+    url=open(filename, 'r')
+    soup=BeautifulSoup(f, 'html.parser')
+    authors=soup.find_all('a', class_='authorName')
+    titles=soup.find_all('a', class_='bookTitle')
+
+    newAuthors=[]
+    newTitle=[]
+    for title in titles:
+        striptitle=title.text.strip()
+        newTitles.append(striptitle)
+
+    for author in authors:
+        stripauthor=author.text.strip()
+        newAuthors.append(stripauthor)
+
+    l=list(zip(newTitles, newAuthors))
+
+    f.close 
+    return l
     """
     Write a function that creates a BeautifulSoup object on "search_results.htm". Parse
     through the object and return a list of tuples containing book titles (as printed on the Goodreads website) 
@@ -15,10 +35,24 @@ def get_titles_from_search_results(filename):
     [('Book title 1', 'Author 1'), ('Book title 2', 'Author 2')...]
     """
 
-    pass
 
 
 def get_search_links():
+    url="https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc"
+    resp=requests.get(url)
+    soup=BeautifulSoup(resp.content, 'html.parser')
+
+    url_list=[]
+    table=soup.find('table', class_='tableList')
+    x=table.find_all('tr')
+    for row in x[:10]:
+        info = row.find_all('td')
+        url=info[0].find('a')
+        link="https://www.goodreads.com" +str(url['href'])
+        url_list.append(link)
+    return url_list
+    
+
     """
     Write a function that creates a BeautifulSoup object after retrieving content from
     "https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc". Parse through the object and return a list of
@@ -32,10 +66,22 @@ def get_search_links():
 
     """
 
-    pass
+    
 
 
 def get_book_summary(book_url):
+    resp= requests.get(book_url)
+    soup= BeautifulSoup(resp.text, 'html.parser')
+    title=soup.find('h1', class_='gr-h1--serif')
+    title_text=title.text.strip()
+    pages=soup.find('span', itemprop='numberOfPages')
+    pages_text=pages.text.split()
+    pages_num=int(pages_text[0])
+    author=soup.find('span', itemprop= 'name')
+    author_text=author.text.strip()
+    
+    bookInfo= (title_text, author_text, pages_num)
+    return bookInfo 
     """
     Write a function that creates a BeautifulSoup object that extracts book
     information from a book's webpage, given the URL of the book. Parse through
@@ -49,10 +95,11 @@ def get_book_summary(book_url):
     Make sure to strip() any newlines from the book title and number of pages.
     """
 
-    pass
+    
 
 
 def summarize_best_books(filepath):
+
     """
     Write a function to get a list of categories, book title and URLs from the "BEST BOOKS OF 2020"
     page in "best_books_2020.htm". This function should create a BeautifulSoup object from a 
@@ -63,10 +110,11 @@ def summarize_best_books(filepath):
     ("Fiction", "The Testaments (The Handmaid's Tale, #2)", "https://www.goodreads.com/choiceawards/best-fiction-books-2020") 
     to your list of tuples.
     """
-    pass
+    
 
 
 def write_csv(data, filename):
+    
     """
     Write a function that takes in a list of tuples (called data, i.e. the
     one that is returned by get_titles_from_search_results()), writes the data to a 
@@ -86,7 +134,7 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    pass
+    
 
 
 def extra_credit(filepath):
@@ -104,6 +152,15 @@ class TestCases(unittest.TestCase):
 
 
     def test_get_titles_from_search_results(self):
+        localvar=get_titles_from_search_results('search_results.htm')
+        self.assertEqual(len(localvar), 20)
+        self.assertIsInstance(localvar, list)
+        for i in localvar:
+            variable=i
+
+        self.assertIsInstance(variable, tuple)
+
+        self.assertEqual(localvar[0], ())
         # call get_titles_from_search_results() on search_results.htm and save to a local variable
 
         # check that the number of titles extracted is correct (20 titles)
@@ -118,6 +175,9 @@ class TestCases(unittest.TestCase):
 
     def test_get_search_links(self):
         # check that TestCases.search_urls is a list
+        self.assertIsInstance(TestCases.search_urls, list)
+        self.assertEqual(len(TestCases.search_urls), 10)
+        self.assertIsInstance(TestCases.search_urls, str)
 
         # check that the length of TestCases.search_urls is correct (10 URLs)
 
