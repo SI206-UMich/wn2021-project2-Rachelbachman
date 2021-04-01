@@ -5,6 +5,8 @@ import os
 import csv
 import unittest
 
+#Rachel Bachman 
+#worked with Jason Brigandi and Molly Herckis 
 
 def get_titles_from_search_results(filename):
     f=open(filename, "r")
