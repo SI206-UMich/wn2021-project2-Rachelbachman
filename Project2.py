@@ -11,8 +11,8 @@ import unittest
 def get_titles_from_search_results(filename):
     f=open(filename, "r")
     soup=BeautifulSoup(f, 'html.parser')
-    authors=soup.find_all("a", class_="authorName")
     titles=soup.find_all("a", class_="bookTitle")
+    authors= soup.find_all('tr')
 
     newAuthors=[]
     newTitles=[]
@@ -22,7 +22,8 @@ def get_titles_from_search_results(filename):
         newTitles.append(striptitle)
 
     for author in authors:
-        stripauthor=author.text.strip()
+        firstauthor=author.find("a", class_="authorName")
+        stripauthor=firstauthor.text.strip()
         newAuthors.append(stripauthor)
 
     l=list(zip(newTitles, newAuthors))
@@ -287,7 +288,7 @@ class TestCases(unittest.TestCase):
         self.assertEqual(len(csv_lines),21)
         self.assertEqual(csv_lines[0], ['Book Title', 'Author Name'])
         self.assertEqual(csv_lines[1], ['Harry Potter and the Deathly Hallows (Harry Potter, #7)', 'J.K. Rowling'])
-        self.assertEqual(csv_lines[-1], ['Harry Potter: The Prequel (Harry Potter, #0.5)', 'Julian Harrison'])
+        self.assertEqual(csv_lines[-1], ['Harry Potter: The Prequel (Harry Potter, #0.5)', 'J.K. Rowling'])
         # call get_titles_from_search_results on search_results.htm and save the result to a variable
 
         # call write csv on the variable you saved and 'test.csv'
